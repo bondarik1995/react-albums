@@ -30,7 +30,6 @@ class Albums extends React.Component {
   render() {
     let user = [];
     const { albums, users } = this.state;
-    console.log(users);
 
     if (this.state.isError) {
       return "Unexpected error. Please, contact support.";
@@ -39,16 +38,30 @@ class Albums extends React.Component {
     return this.state.isLoading ? (
       "....Loading...."
       ) : (
-      <ul>
-        {albums.map(album => (
-          <li key={album.id}>
-            {album.title}:  
-            {users.filter(user => album.userId === user.id).map(user => (
-              <i style={{ color: 'red' }}>({user.name})</i>
-            ))}
-          </li>
-        ))}
-      </ul>
+      <div>
+        <h2>All albums</h2>
+        <ul>
+          {albums.map(album => (
+            <li key={album.id}>
+              {album.title}:  
+              {users.filter(user => album.userId === user.id).map(user => (
+                <i style={{ color: 'red' }}>({user.name})</i>
+              ))}
+            </li>
+          ))}
+        </ul>
+        <h2>All users</h2>
+        <ul>
+          {users.map(user => (
+            <li key={user.id}>
+              {user.name}:  
+              {albums.filter(album => album.userId === user.id).map(album => (
+                <i style={{ color: 'red' }}><br />- {album.title}</i>
+              ))}
+            </li>
+          ))}
+        </ul>
+      </div>
     );
   }
 }
