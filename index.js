@@ -3,6 +3,16 @@ import { render } from 'react-dom';
 
 import './style.css';
 
+const urls = [
+  'https://jsonplaceholder.typicode.com/albums',
+  'https://jsonplaceholder.typicode.com/users'
+];
+
+const urlList = {
+  'https://jsonplaceholder.typicode.com/albums': 'albums',
+  'https://jsonplaceholder.typicode.com/users': 'users'
+};
+
 class Albums extends React.Component {
   state = {
     isLoading: true,
@@ -16,15 +26,18 @@ class Albums extends React.Component {
   };
 
   componentDidMount() {
-    fetch("https://jsonplaceholder.typicode.com/albums")
-    .then(response => response.json())
-    .then(albums => this.setState({ isLoading: false, albums }))
-    .catch(this.onError);
+    const setData = (url, data) => {
+      urlList[url] === 'users' ? this.setState({ users: data }) : this.setState({ albums: data });
+      this.state.users !== [] && this.state.albums !== [] ? this.setState({ isLoading: false }) : '';
+    };
 
-    fetch("https://jsonplaceholder.typicode.com/users")
-    .then(response => response.json())
-    .then(users => this.setState({ users }))
-    .catch(this.onError);
+    Promise.all(['https://jsonplaceholder.typicode.com/albums', 'https://jsonplaceholder.typicode.com/users']).then(value => { 
+      value.map(url => fetch(url)
+      .then(response => response.json())
+      .then(items => setData(url, items)));
+    }, reason => {
+      this.setState({ isError: this.onError })
+    });
   }
 
   render() {
@@ -56,7 +69,7 @@ class Albums extends React.Component {
             <li key={user.id}>
               {user.name}:  
               {albums.filter(album => album.userId === user.id).map(album => (
-                <i style={{ color: 'red' }}><br />- {album.title}</i>
+                <i key={album.id} style={{ color: 'red' }}><br />- {album.title}</i>
               ))}
             </li>
           ))}
